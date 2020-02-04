@@ -1,3 +1,7 @@
+# 2.0.0-beta
+* Update to `graphql_server@^2.0.0-beta`.
+* Add `graphQLPlayground` as an alternative to `graphiql`.
+
 # 1.1.0
 * Support the GraphQL multipart spec: https://github.com/jaydenseric/graphql-multipart-request-spec
 
