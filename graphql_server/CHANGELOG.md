@@ -1,3 +1,6 @@
+# 2.0.0-beta
+* Migrate away from `package:graphql_parser`, and instead use `package:gql/language.dart`.
+
 # 1.1.0
 * Updates for `package:graphql_parser@1.2.0`.
 * Now that variables are `InputValueContext` descendants, handle them the
