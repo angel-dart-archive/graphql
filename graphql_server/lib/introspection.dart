@@ -1,4 +1,4 @@
-import 'package:graphql_parser/graphql_parser.dart';
+import 'package:gql/ast.dart' as gql;
 import 'package:graphql_schema/graphql_schema.dart';
 
 /// Performs introspection over a GraphQL [schema], and returns a one, containing
@@ -96,10 +96,13 @@ GraphQLObjectType _reflectSchemaTypes() {
         'ofType',
         _reflectSchemaTypes(),
         resolve: (type, _) {
-          if (type is GraphQLListType)
+          if (type is GraphQLListType) {
             return type.ofType;
-          else if (type is GraphQLNonNullableType) return type.ofType;
-          return null;
+          } else if (type is GraphQLNonNullableType) {
+            return type.ofType;
+          } else {
+            return null;
+          }
         },
       ),
     );
@@ -224,7 +227,7 @@ GraphQLObjectType _createTypeType() {
       'fields',
       listOf(fieldType),
       inputs: [
-        new GraphQLFieldInput(
+        GraphQLFieldInput(
           'includeDeprecated',
           graphQLBoolean,
           defaultValue: false,
@@ -241,7 +244,7 @@ GraphQLObjectType _createTypeType() {
       'enumValues',
       listOf(enumValueType.nonNullable()),
       inputs: [
-        new GraphQLFieldInput(
+        GraphQLFieldInput(
           'includeDeprecated',
           graphQLBoolean,
           defaultValue: false,
@@ -370,7 +373,7 @@ GraphQLObjectType _reflectDirectiveType() {
     field(
       'name',
       graphQLString.nonNullable(),
-      resolve: (obj, _) => (obj as DirectiveContext).nameToken.span.text,
+      resolve: (obj, _) => (obj as gql.DirectiveNode).name.value,
     ),
     field(
       'description',
@@ -439,7 +442,7 @@ List<GraphQLType> fetchAllTypes(
 }
 
 class CollectTypes {
-  Set<GraphQLType> traversedTypes = {};
+  Set<GraphQLType> traversedTypes = Set();
 
   Set<GraphQLType> get types => traversedTypes;
 
