@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:angel_framework/angel_framework.dart';
 import 'package:angel_validate/server.dart';
-import 'package:graphql_parser/graphql_parser.dart';
 import 'package:graphql_schema/graphql_schema.dart';
 import 'package:graphql_server/graphql_server.dart';
+import 'package:source_span/source_span.dart';
 
 final ContentType graphQlContentType = ContentType('application', 'graphql');
 
@@ -164,8 +164,12 @@ RequestHandler graphQLHttp(GraphQL graphQL,
 
       errors.addAll(e.errors.map((ee) => GraphQLExceptionError(ee)).toList());
       return GraphQLException(errors).toJson();
-    } on SyntaxError catch (e) {
-      return GraphQLException.fromSourceSpan(e.message, e.span);
+    } on SourceSpanException catch (e) {
+      throw GraphQLException([
+        GraphQLExceptionError(e.message, locations: [
+          GraphExceptionErrorLocation.fromSourceLocation(e.span.start),
+        ]),
+      ]);
     } on GraphQLException catch (e) {
       return e.toJson();
     } catch (e, st) {

@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use
+import 'package:angel_container/mirrors.dart';
 import 'package:angel_framework/angel_framework.dart';
 import 'package:angel_framework/http.dart';
 import 'package:angel_graphql/angel_graphql.dart';
@@ -7,16 +8,15 @@ import 'package:graphql_schema/graphql_schema.dart';
 import 'package:graphql_server/graphql_server.dart';
 import 'package:graphql_server/mirrors.dart';
 import 'package:logging/logging.dart';
+import 'package:pretty_logging/pretty_logging.dart';
 
 main() async {
+  Logger.root
+    ..level = Level.ALL
+    ..onRecord.listen(prettyLog);
+
   var logger = Logger('angel_graphql');
-  var app = Angel(
-      logger: logger
-        ..onRecord.listen((rec) {
-          print(rec);
-          if (rec.error != null) print(rec.error);
-          if (rec.stackTrace != null) print(rec.stackTrace);
-        }));
+  var app = Angel(logger: logger, reflector: MirrorsReflector());
   var http = AngelHttp(app);
 
   var todoService = app.use('api/todos', MapService());
@@ -64,6 +64,7 @@ main() async {
 
   app.all('/graphql', graphQLHttp(GraphQL(schema)));
   app.get('/graphiql', graphiQL());
+  app.get('/playground', graphQLPlayground());
 
   await todoService
       .create({'text': 'Clean your room!', 'completion_status': 'COMPLETE'});
@@ -78,8 +79,10 @@ main() async {
   var uri =
       Uri(scheme: 'http', host: server.address.address, port: server.port);
   var graphiqlUri = uri.replace(path: 'graphiql');
+  var graphQLPlaygroundUri = uri.replace(path: 'playground');
   print('Listening at $uri');
   print('Access graphiql at $graphiqlUri');
+  print('Access GraphQL Playground at $graphQLPlaygroundUri');
 }
 
 @GraphQLDocumentation(description: 'Any object with a .text (String) property.')

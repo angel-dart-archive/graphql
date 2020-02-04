@@ -3,6 +3,7 @@ import 'package:graphql_schema/graphql_schema.dart';
 export 'src/graphiql.dart';
 export 'src/graphql_http.dart';
 export 'src/graphql_ws.dart';
+export 'src/playground.dart';
 export 'src/resolvers.dart';
 
 /// The canonical [GraphQLUploadType] instance.
